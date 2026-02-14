@@ -1,0 +1,31 @@
+{
+  "name": "tspokedex",
+  "version": "1.0.0",
+  "description": "Bootdev typescript pokedex project",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/main.js",
+    "dev": "concurrently \"tsc --watch\" \"nodemon --watch dist dist/main.js\"",
+    "test": "vitest --run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Trptguy09/tspokedex.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Trptguy09/tspokedex/issues"
+  },
+  "homepage": "https://github.com/Trptguy09/tspokedex#readme",
+  "devDependencies": {
+    "@types/node": "^25.2.3",
+    "concurrently": "^9.0.0",
+    "nodemon": "^3.1.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  }
+}
