@@ -1,29 +1,24 @@
 import { createInterface } from "readline";
 import { commandExit } from "./command_exit.js";
+import { CLICommand } from "./command.js";
+import { cleanInput } from "./helper_func.js";
+import { commandHelp } from "./command_help.js";
 
-export type CLICommand = {
-    name: string;
-    description: string;
-    callback: (commands: Record<string, CLICommand>) => void;
-};
 
 export function getCommands(): Record<string, CLICommand> {
     return {
         exit: {
             name: "exit",
-            description: "Exits the pokedex",
+            description: "Exit the Pokedex",
             callback: commandExit,
         },
+        help: {
+            name: "help",
+            description: "Displays a help message",
+            callback: commandHelp,
+        }
         //add more commands here
     };
-}
-
-export function cleanInput(input: string): string[] {
-    return input
-    .trim()
-    .toLowerCase()
-    .split(/\s+/)
-    .filter((w) => w !== "");
 }
 
 export function startREPL() {
@@ -40,11 +35,18 @@ export function startREPL() {
             rl.prompt();
             return;
         }
-        let command= getCommands();
+        let commands = getCommands();
+        const command = commands[words[0]];
         if (command) {
-            command.callback()
-        }
+            try {
+                command.callback(commands);
+            } catch (error: unknown) {
+                console.error("An error occured", error);
+            }
+            rl.prompt();
+        } else {
+        console.log("Unknown command");
         rl.prompt();
-        return
+        }
     });
 }

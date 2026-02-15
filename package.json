@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/main.js",
-    "dev": "concurrently \"tsc --watch\" \"nodemon --watch dist dist/main.js\"",
+    "dev": "npm run build && node dist/main.js",
     "test": "vitest --run"
   },
   "repository": {
