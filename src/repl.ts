@@ -1,9 +1,8 @@
-import { createInterface } from "readline";
+
 import { commandExit } from "./command_exit.js";
-import { CLICommand } from "./command.js";
+import { CLICommand, State} from "./state.js"
 import { cleanInput } from "./helper_func.js";
 import { commandHelp } from "./command_help.js";
-
 
 export function getCommands(): Record<string, CLICommand> {
     return {
@@ -21,32 +20,25 @@ export function getCommands(): Record<string, CLICommand> {
     };
 }
 
-export function startREPL() {
-    const rl = createInterface({
-        input: process.stdin,
-        output: process.stdout,
-        prompt: "Pokedex > ",
-    });
-
-    rl.prompt();
-    rl.on("line", (input) => {
+export function startREPL(state: State) {
+    state.rl.prompt();
+    state.rl.on("line", (input) => {
         const words = cleanInput(input);
         if (words.length === 0) {
-            rl.prompt();
+            state.rl.prompt();
             return;
         }
-        let commands = getCommands();
-        const command = commands[words[0]];
+        const command = state.commands[words[0]];
         if (command) {
             try {
-                command.callback(commands);
+                command.callback(state);
             } catch (error: unknown) {
                 console.error("An error occured", error);
             }
-            rl.prompt();
+            state.rl.prompt();
         } else {
         console.log("Unknown command");
-        rl.prompt();
+        state.rl.prompt();
         }
     });
 }
