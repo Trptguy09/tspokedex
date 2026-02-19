@@ -1,7 +1,15 @@
+import { Cache } from "./pokecache.js";
+
 export class PokeAPI {
   private static readonly baseURL = "https://pokeapi.co/api/v2";
-
-  constructor() {}
+  private cache: Cache;
+  stopReapLoop() {
+    this.cache.stopReapLoop();
+  }
+  
+  constructor(cacheInterval: number = 10_000) {
+    this.cache = new Cache(cacheInterval);
+  }
 
   async fetchLocations(pageURL?: string): Promise<ShallowLocations> {
     let locationsURL = `${PokeAPI.baseURL}/location-area/`
@@ -9,34 +17,45 @@ export class PokeAPI {
     if (pageURL) {
         locationsURL = pageURL;
     }
-    try {
+
+    let result = this.cache.get<ShallowLocations>(locationsURL)
+    if (result) {
+      return result;
+    } else {
+      try {
         const resp = await fetch(locationsURL);
 
-    if (!resp.ok) {
-        throw new Error(`Failed to fetch locations: ${resp.status}`)
-    }
-    const data: ShallowLocations = await resp.json();
-    return data;
-    } catch(error) {
-    console.error("Error fetching locations:", error);
-    throw error;
+      if (!resp.ok) {
+          throw new Error(`Failed to fetch locations: ${resp.status}`)
+      }
+      const data: ShallowLocations = await resp.json();
+      this.cache.add(locationsURL, data);
+      return data;
+      } catch(error) {
+      console.error("Error fetching locations:", error);
+      throw error;
+      }
     }
   }
 
   async fetchLocation(locationName: string): Promise<Location> {
     let singleLocationURL = `${PokeAPI.baseURL}/location-area/${locationName}`;
-
-    try {
-      const resp = await fetch(singleLocationURL);
-
-      if (!resp.ok) {
-        throw new Error(`failed to fetch location: ${resp.status}`)
+    let result = this.cache.get<Location>(singleLocationURL);
+    if (result) {
+      return result;
+    } else {
+      try {
+        const resp = await fetch(singleLocationURL);
+        if (!resp.ok) {
+          throw new Error(`failed to fetch location: ${resp.status}`)
+        }
+        const data: Location = await resp.json();
+        this.cache.add(singleLocationURL, data);
+        return data;
+      } catch (error) {
+        console.error("Error fetching location:", error);
+        throw error;
       }
-      const data: Location = await resp.json();
-      return data;
-    } catch (error) {
-      console.error("Error fetching location:", error);
-      throw error;
     }
   }
 }
