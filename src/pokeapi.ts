@@ -71,5 +71,5 @@ export type Location = {
   id: number;
   name: string;
   location: { name: string; url: string };
-  pokemon_encounters: unknown[];
+  pokemon_encounters: { pokemon: { name: string } }[];
 };
